@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Aura - Reminders</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/config.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800">
     <div class="w-full bg-amber-50 text-amber-900 border-b border-amber-200 text-sm" id="appStatus" style="display:none"></div>
@@ -73,14 +74,10 @@
         import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyANDQQCNiUKrOQln86MtdeI1OUnSJsnWA0",
-            authDomain: "aura-gdg-a5522.firebaseapp.com",
-            projectId: "aura-gdg-a5522",
-            storageBucket: "aura-gdg-a5522.firebasestorage.app",
-            messagingSenderId: "61764030677",
-            appId: "1:61764030677:web:2aba3221c9e0393b56d25c"
-        };
+        const firebaseConfig = (window.AURA_CONFIG && window.AURA_CONFIG.firebaseConfig) || {};
+        if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+            showStatus('Firebase config missing. Set env vars and restart: FIREBASE_*', 'error');
+        }
 
         let app, auth, db, userId = null;
         try {
@@ -186,9 +183,9 @@
         }
         setInterval(pollAlerts, 4000);
 
-        onAuthStateChanged(getAuth(), async (user) => {
+        onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                try { await signInAnonymously(getAuth()); showStatus('Signed in anonymously', 'info'); }
+                try { await signInAnonymously(auth); showStatus('Signed in anonymously', 'info'); }
                 catch (e) { showStatus(`Auth error: ${e?.message || e}`, 'error'); }
             } else {
                 userId = user.uid;

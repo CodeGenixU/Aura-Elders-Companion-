@@ -18,10 +18,19 @@ Simple full-stack web app with an empathetic AI chat (Gemini) and Firestore-back
    ```bash
    pip install -r requirements.txt
    ```
-3. Set Gemini API Key (either)
-   - Edit `app.py` and set `API_KEY = "YOUR_KEY"`, or
-   - Set environment variable before run:
-     - PowerShell: `$env:GEMINI_API_KEY = "YOUR_KEY"`
+3. Create `.env` at project root (copy `.env.example`)
+   ```
+   GEMINI_API_KEY=YOUR_GEMINI_KEY
+   GEMINI_MODEL=gemini-2.5-flash-lite
+   GEMINI_API_VERSION=v1
+   
+   FIREBASE_API_KEY=YOUR_FIREBASE_API_KEY
+   FIREBASE_AUTH_DOMAIN=YOUR_PROJECT_ID.firebaseapp.com
+   FIREBASE_PROJECT_ID=YOUR_PROJECT_ID
+   FIREBASE_STORAGE_BUCKET=YOUR_PROJECT_ID.appspot.com
+   FIREBASE_MESSAGING_SENDER_ID=YOUR_SENDER_ID
+   FIREBASE_APP_ID=YOUR_APP_ID
+   ```
 
 4. Run backend (serves API + frontend)
    ```bash

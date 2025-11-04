@@ -4,8 +4,10 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import requests
 from flask import send_from_directory
+from dotenv import load_dotenv
 
 
+load_dotenv()
 app = Flask(__name__, static_folder='.', static_url_path='')
 # Allow requests from file:// and localhost for local development
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -14,12 +16,11 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 # -----------------------------
 # Configuration
 # -----------------------------
-# Insert your Gemini API key here for local development
-# Or set the environment variable GEMINI_API_KEY instead
+# Insert your Gemini API key via environment (see .env.example)
 API_KEY = os.getenv("GEMINI_API_KEY", "") or ""
 
 # Choose a lightweight, cost‑effective model for chat (configurable via env GEMINI_MODEL)
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
 API_VERSION = os.getenv("GEMINI_API_VERSION", "v1")  # use v1 by default
 
 
@@ -50,7 +51,7 @@ def call_gemini(prompt: str) -> str:
     candidate_models = []
     primary = (GEMINI_MODEL or "").strip() or "gemini-1.5-flash"
     candidate_models.append(primary)
-    for fallback in ("gemini-1.5-flash", "gemini-1.5-flash-8b"):
+    for fallback in ("gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-1.5-flash", "gemini-1.5-flash-8b"):
         if fallback not in candidate_models:
             candidate_models.append(fallback)
 
@@ -100,7 +101,10 @@ def call_gemini(prompt: str) -> str:
 
 @app.route("/health", methods=["GET"])
 def health() -> tuple:
-    return jsonify({"ok": True}), 200
+    resp = jsonify({"ok": True})
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    return resp, 200
 
 
 @app.route("/chat", methods=["POST"])
@@ -112,7 +116,10 @@ def chat() -> tuple:
             return jsonify({"error": "Missing 'message'"}), 400
 
         reply = call_gemini(user_message)
-        return jsonify({"reply": reply}), 200
+        resp = jsonify({"reply": reply})
+        resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        resp.headers["Pragma"] = "no-cache"
+        return resp, 200
     except Exception as exc:
         return jsonify({"error": str(exc)}), 500
 
@@ -145,6 +152,25 @@ def page_about() -> any:
 def page_privacy() -> any:
     return send_from_directory(app.static_folder, "privacy.html")
 
+
+@app.route("/config.js")
+def config_js():
+    firebase_config = {
+        "apiKey": os.getenv("FIREBASE_API_KEY", ""),
+        "authDomain": os.getenv("FIREBASE_AUTH_DOMAIN", ""),
+        "projectId": os.getenv("FIREBASE_PROJECT_ID", ""),
+        "storageBucket": os.getenv("FIREBASE_STORAGE_BUCKET", ""),
+        "messagingSenderId": os.getenv("FIREBASE_MESSAGING_SENDER_ID", ""),
+        "appId": os.getenv("FIREBASE_APP_ID", ""),
+    }
+    body = (
+        "window.AURA_CONFIG = window.AURA_CONFIG || {};\n"
+        f"window.AURA_CONFIG.firebaseConfig = {json.dumps(firebase_config)};\n"
+    )
+    resp = app.response_class(body, mimetype='application/javascript')
+    resp.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    return resp
 
 if __name__ == "__main__":
     # You can also set host="0.0.0.0" if needed

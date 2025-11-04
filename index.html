@@ -6,6 +6,7 @@
     <title>Aura Companion</title>
     <!-- Tailwind CSS via CDN for quick local dev -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/config.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800">
     <div class="w-full bg-amber-50 text-amber-900 border-b border-amber-200 text-sm" id="appStatus" style="display:none"></div>
@@ -97,14 +98,16 @@
             showStatus(`Unhandled error: ${e.reason}`, 'error');
         });
 
-        // --- Firebase Configuration (FOR LOCAL DEVELOPMENT) ---
-        // Using your Firebase project config
-
-
-        // Firebase imports
+        // Firebase imports (import first)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
         import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+        // --- Firebase Configuration injected by backend (.env) ---
+        const firebaseConfig = (window.AURA_CONFIG && window.AURA_CONFIG.firebaseConfig) || {};
+        if (!firebaseConfig.apiKey || !firebaseConfig.projectId) {
+            showStatus('Firebase config missing. Set env vars and restart: FIREBASE_*', 'error');
+        }
 
         // Same-origin by default; allow override via localStorage
         const BACKEND_URL = (localStorage.getItem('AURA_BACKEND_URL') || window.location.origin).replace(/\/$/, '');
