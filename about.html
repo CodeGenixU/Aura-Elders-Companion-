@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura - About</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <nav class="bg-white/80 backdrop-blur border-b border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+            <a href="index.html" class="font-semibold text-slate-800">Aura</a>
+            <div class="flex items-center gap-4 text-sm">
+                <a class="text-slate-700 hover:text-indigo-700" href="chat.html">Chat</a>
+                <a class="text-slate-700 hover:text-indigo-700" href="reminders.html">Reminders</a>
+                <a class="text-indigo-700 font-medium" href="about.html">About</a>
+                <a class="text-slate-700 hover:text-indigo-700" href="privacy.html">Privacy</a>
+            </div>
+        </div>
+    </nav>
+    <main class="max-w-3xl mx-auto p-6 space-y-4">
+        <h1 class="text-3xl font-semibold">About Aura</h1>
+        <p class="text-slate-700">Aura is a simple companion app that combines an empathetic AI chat with a lightweight reminder system. It uses a small Flask backend to securely relay your messages to Google’s Gemini model and Firebase/Firestore to store your reminders.</p>
+        <h2 class="text-xl font-semibold mt-6">How it works</h2>
+        <ul class="list-disc pl-6 text-slate-700 space-y-1">
+            <li>Chat requests go from your browser → Flask → Gemini → back to your browser.</li>
+            <li>Reminders are stored directly in Firestore under your anonymous user ID.</li>
+            <li>All UI is built with Tailwind CSS for clarity and speed.</li>
+        </ul>
+        <h2 class="text-xl font-semibold mt-6">Tech</h2>
+        <ul class="list-disc pl-6 text-slate-700 space-y-1">
+            <li>Frontend: HTML + Tailwind + Firebase Web SDK</li>
+            <li>Backend: Python Flask + CORS + requests</li>
+            <li>AI: Gemini 1.5 Flash</li>
+            <li>Database: Firestore</li>
+        </ul>
+    </main>
+</body>
+</html>
+
+
